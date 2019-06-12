@@ -178,34 +178,55 @@ class ArrayHelper
             return $key($array, $default);
         }
 
+        if(is_string($key)) {
+
+            list($success,$value) = static::_getValueOrDefault($array, $key);
+            if ($success) {
+                return $value;
+            }
+
+            if (($pos = strrpos($key, '.')) !== false) {
+                $key = explode(".", $key);
+            }
+        }
+
+        /** if key is array try to access it exactly as defined */
         if (is_array($key)) {
             $lastKey = array_pop($key);
             foreach ($key as $keyPart) {
-                $array = static::getValue($array, $keyPart);
+                $array = static::getValue($array, static::_getArrayKeyLiteralClosure($keyPart));
             }
             $key = $lastKey;
         }
 
-        if (is_array($array) && (isset($array[$key]) || array_key_exists($key, $array))) {
-            return $array[$key];
-        }
-
-        if (($pos = strrpos($key, '.')) !== false) {
-            $array = static::getValue($array, substr($key, 0, $pos), $default);
-            $key = substr($key, $pos + 1);
-        }
-
-        if (is_object($array)) {
-            // this is expected to fail if the property does not exist, or __get() is not implemented
-            // it is not reliably possible to check whether a property is accessible beforehand
-            return $array->$key;
-        } elseif (is_array($array)) {
-            return (isset($array[$key]) || array_key_exists($key, $array)) ? $array[$key] : $default;
-        }
-
-        return $default;
+        return static::_getValueOrDefault($array,$key,$default)[1];
     }
 
+
+    /**
+     * @param $array
+     * @param $key
+     * @param null $default
+     * @return array(bool,mixed) 0 = true if key was found and false otherwise
+     */
+    private static function _getValueOrDefault($array,$key,$default = null){
+        $keyStr=$key."";
+        if (is_object($array) && property_exists($array,$keyStr)) {
+            return array(true,$array->$keyStr);
+        } elseif (is_array($array) && array_key_exists($keyStr, $array)) {
+            return array(true, $array[$keyStr]);
+        }
+        return array(false,$default);
+    }
+    /**
+     * @param $key
+     * @return \Closure
+     */
+    private static function _getArrayKeyLiteralClosure($key){
+        return function($array,$default) use ($key) {
+           return static::_getValueOrDefault($array,$key,$default)[1];
+        };
+    }
     /**
      * Writes a value into an associative array at the key path specified.
      * If there is no such key path yet, it will be created recursively.

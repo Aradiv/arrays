@@ -761,6 +761,7 @@ class ArrayHelperTest extends TestCase
                 'test',
             ],
             [['version', '1.0', 'status'], 'released'],
+            ['version.1.0.status', 'not_released'],
             [['version', '1.0', 'date'], 'defaultValue', 'defaultValue'],
         ];
     }
@@ -792,6 +793,11 @@ class ArrayHelperTest extends TestCase
                 'lastname' => 'cebe',
             ],
             'version' => [
+                '1' => [
+                    '0' => [
+                        'status' => 'not_released'
+                    ]
+                ],
                 '1.0' => [
                     'status' => 'released',
                 ],
