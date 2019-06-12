@@ -822,7 +822,7 @@ class ArrayHelperTest extends TestCase
      */
     public function testGetValueNonexistingProperties1()
     {
-        $this->expectException(\PHPUnit\Framework\Error\Error::class);
+        //$this->expectException(\PHPUnit\Framework\Error\Error::class);
         $object = new Post1();
         $this->assertNull(ArrayHelper::getValue($object, 'nonExisting'));
     }
@@ -833,11 +833,19 @@ class ArrayHelperTest extends TestCase
      */
     public function testGetValueNonexistingProperties2()
     {
-        $this->expectException(\PHPUnit\Framework\Error\Error::class);
+        //$this->expectException(\PHPUnit\Framework\Error\Error::class);
         $arrayObject = new \ArrayObject(['id' => 23], \ArrayObject::ARRAY_AS_PROPS);
-        $this->assertEquals(23, ArrayHelper::getValue($arrayObject, 'nonExisting'));
+        $this->assertEquals(null, ArrayHelper::getValue($arrayObject, 'nonExisting'));
     }
-
+    /**
+     * This is expected to result in a PHP error.
+     * @requires PHPUnit 6.0
+     */
+    public function testGetValueNonexistingPropertiesWithDefault()
+    {
+        $arrayObject = new \ArrayObject(['id' => 23], \ArrayObject::ARRAY_AS_PROPS);
+        $this->assertEquals("default", ArrayHelper::getValue($arrayObject, 'nonExisting', "default"));
+    }
     /**
      * Data provider for [[testSetValue()]].
      * @return array test data
