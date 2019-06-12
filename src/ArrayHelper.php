@@ -204,17 +204,16 @@ class ArrayHelper
 
 
     /**
-     * @param $array
-     * @param $key
+     * @param array|object $array
+     * @param String $key
      * @param null $default
      * @return array(bool,mixed) 0 = true if key was found and false otherwise
      */
-    private static function _getValueOrDefault($array,$key,$default = null){
-        $keyStr=$key."";
-        if (is_object($array) && property_exists($array,$keyStr)) {
-            return array(true,$array->$keyStr);
-        } elseif (is_array($array) && array_key_exists($keyStr, $array)) {
-            return array(true, $array[$keyStr]);
+    private static function _getValueOrDefault($array,String $key,$default = null){
+        if (is_object($array) && property_exists($array,$key)) {
+            return array(true,$array->$key);
+        } elseif (is_array($array) && array_key_exists($key, $array)) {
+            return array(true, $array[$key]);
         }
         return array(false,$default);
     }
@@ -287,6 +286,10 @@ class ArrayHelper
         }
 
         $keys = is_array($path) ? $path : explode('.', $path);
+        if(!isset($array[$keys[0]]) && is_string($path)){
+            $array[$path]=$value;
+            return;
+        }
 
         while (count($keys) > 1) {
             $key = array_shift($keys);

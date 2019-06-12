@@ -884,7 +884,7 @@ class ArrayHelperTest extends TestCase
                 'key.in', 'val',
                 [
                     'key1' => 'val1',
-                    'key' => ['in' => 'val'],
+                    'key.in' => 'val',
                 ],
             ],
             [
